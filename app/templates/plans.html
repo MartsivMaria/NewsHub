@@ -1,0 +1,108 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<section class="plans-section">
+    <div class="plans-header">
+        <h1>Оберіть свій тариф</h1>
+        <p>Отримуйте більше можливостей разом із NewsHub!</p>
+    </div>
+
+    <div class="plans-container">
+
+        <div class="plan-card">
+            <h2>Free</h2>
+            <div class="plan-price">0 ₴</div>
+            <p class="plan-description">Для тих, хто хоче читати новини</p>
+        
+            <ul>
+                <li>✓ Доступ до звичайних статей</li>
+                <li>✓ Збереження новин</li>
+                <li>✗ Реклама на сайті</li>
+                <li>✗ Ексклюзивні статті</li>
+            </ul>
+        
+            {% if current_user.is_authenticated and current_user.subscription_plan == 'free' %}
+            <button class="plan-button current-plan" disabled>Ваш тариф</button>
+            {% elif current_user.is_authenticated %}
+            <form method="POST" action="{{ url_for('subscribe', plan='free') }}">
+                <button type="submit" class="plan-button">Обрати Free</button>
+            </form>
+            {% else %}
+            <a href="{{ url_for('login') }}" class="plan-button">Безкоштовно</a>
+            {% endif %}
+        </div>
+        
+        
+        <div class="plan-card premium-card">
+            <h2>Premium</h2>
+            <div class="plan-price">9.99 $</div>
+            <p class="plan-description">Для справжніх поціновувачів новин</p>
+        
+            <ul>
+                <li>✓ Доступ до всіх статей</li>
+                <li>✓ Без реклами</li>
+                <li>✓ Ексклюзивні матеріали, персональні рекомендації</li>
+                <li>✓ Щоденний дайджест на e-mail</li>
+            </ul>
+        
+            {% if current_user.is_authenticated and current_user.subscription_plan == 'premium' %}
+            <button class="plan-button current-plan" disabled>Ваш тариф</button>
+            {% else %}
+            <form method="POST" action="{{ url_for('subscribe', plan='premium') }}">
+                <button type="submit" class="plan-button">Оформити</button>
+            </form>
+            {% endif %}
+        </div>
+        
+        
+        <div class="plan-card student-card">
+            <span class="plan-label">Для студентів</span>
+            <h2>Student</h2>
+            <div class="plan-price">4.99 $</div>
+            <p class="plan-description">Більше можливостей за вигідною ціною</p>
+        
+            <ul>
+                <li>✓ Доступ до всіх статей</li>
+                <li>✓ Без реклами</li>
+                <li>✓ Ексклюзивні матеріали</li>
+                <li>✓ Персональні рекомендації</li>
+            </ul>
+        
+            {% if current_user.is_authenticated and current_user.subscription_plan == 'student' %}
+            <button class="plan-button current-plan" disabled>Ваш тариф</button>
+            {% else %}
+            <form method="POST" action="{{ url_for('subscribe', plan='student') }}">
+                <button type="submit" class="plan-button">Оформити</button>
+            </form>
+            {% endif %}
+        </div>
+        
+        
+        <div class="plan-card corporate-card">
+            <span class="plan-label">Для команд</span>
+            <h2>Corporate</h2>
+            <div class="plan-price">49.99 $</div>
+            <p class="plan-description">Рішення для команд та організацій</p>
+        
+            <ul>
+                <li>✓ Доступ до всіх статей</li>
+                <li>✓ Без реклами</li>
+                <li>✓ Ексклюзивні матеріали</li>
+                <li>✓ До 10 користувачів в одній підписці</li>
+
+            </ul>
+        
+            {% if current_user.is_authenticated and current_user.subscription_plan == 'corporate' %}
+            <button class="plan-button current-plan" disabled>Ваш тариф</button>
+            {% else %}
+            <form method="POST" action="{{ url_for('subscribe', plan='corporate') }}">
+                <button type="submit" class="plan-button">Оформити</button>
+            </form>
+            {% endif %}
+        </div>
+
+    </div>
+</section>
+
+{% endblock %}

@@ -1,0 +1,57 @@
+```html
+{% extends "base.html" %}
+
+{% block content %}
+<section class="notifications-page">
+    <h1>Мої сповіщення</h1>
+
+    {% if notifications %}
+    <div class="notifications-list">
+        {% for notification in notifications %}
+        <div class="notification-item {% if not notification.is_read %}unread{% endif %}">
+            <div class="notification-content">
+                <h3>{{ notification.title }}</h3>
+                <p>{{ notification.message }}</p>
+
+                <small>
+                    {{ notification.created_at.strftime('%d.%m.%Y %H:%M') }}
+                </small>
+
+                {% if notification.digest_id and digest_articles.get(notification.id) %}
+                <div class="digest-articles">
+                    <h4>Новини для вас:</h4>
+
+                    {% for article in digest_articles[notification.id] %}
+                    <div class="digest-article">
+                        <h5>{{ article.title }}</h5>
+                        <p>{{ article.description }}</p>
+
+                        <a href="{{ url_for('article', article_id=article.id) }}">
+                            Читати новину
+                        </a>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% endif %}
+            </div>
+
+            {% if not notification.is_read %}
+            <form action="{{ url_for('mark_notification_read', notification_id=notification.id) }}" method="POST">
+                <button type="submit">
+                    Позначити прочитаним
+                </button>
+            </form>
+            {% elif notification.link and not notification.digest_id %}
+            <a href="{{ notification.link }}">Переглянути</a>
+            {% endif %}
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <p class="empty-notifications">
+        Поки що у вас немає сповіщень.
+    </p>
+    {% endif %}
+</section>
+{% endblock %}
+```

@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="uk">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <meta name="description" content="NewsHub — сучасна онлайн-газета з актуальними новинами.">
+
+    <title>NewsHub — Новини, які мають значення</title>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+
+<body>
+
+    <header class="site-header">
+        <div class="container header-content">
+
+            <a href="{{ url_for('index') }}" class="logo">
+                News<span>Hub</span>
+                <span class="logo-dot">.</span>
+            </a>
+
+            <nav class="main-nav">
+                <a href="{{ url_for('index') }}" class="nav-link active">
+                    Головна
+                </a>
+                <a href="#categories" class="nav-link">Категорії</a>
+                <a href="#latest" class="nav-link">Останні новини</a>
+                <a href="#breaking" class="nav-link">Термінові</a>
+                <a href="#exclusive" class="nav-link">Ексклюзивні</a>
+            </nav>
+
+            {% if current_user.is_authenticated %}
+
+            {% if current_user.role == "admin" %}
+            <a href="{{ url_for('admin_panel') }}" class="header-button">
+                Адмін-панель
+            </a>
+            {% endif %}
+            
+            <a href="{{ url_for('notifications') }}" class="header-button notification-button">
+                🔔 Сповіщення
+                {% if unread_notifications_count > 0 %}
+                <span class="notification-count">
+                    {{ unread_notifications_count }}
+                </span>
+                {% endif %}
+            </a>
+            
+            <a href="{{ url_for('profile') }}" class="header-button">
+                Мій профіль
+            </a>
+            
+            <form action="{{ url_for('logout') }}" method="POST" class="header-auth-form">
+                <button type="submit" class="header-button">
+                    Вийти
+                </button>
+            </form>
+            {% else %}
+            <a href="{{ url_for('login') }}" class="header-button">
+                Увійти
+            </a>
+            
+            <a href="{{ url_for('register') }}" class="header-button">
+                Реєстрація
+            </a>
+            {% endif %}
+
+            <button class="menu-toggle" id="menuToggle" type="button" aria-label="Відкрити меню" aria-expanded="false">
+                ☰
+            </button>
+
+        </div>
+    </header>
+
+    <main>
+
+        <section class="hero">
+            <div class="container hero-content">
+
+                <div class="hero-text">
+                    <span class="eyebrow">
+                        <span class="status-dot"></span>
+                        ІНФОРМАЦІЯ БЕЗ ЗАЙВОГО
+                    </span>
+
+                    <h1>
+                        Новини, які
+                        <span>мають значення.</span>
+                    </h1>
+
+                    <p>
+                        Читай про технології, науку, освіту, спорт і культуру.
+                        Найцікавіше — в одному місці.
+                    </p>
+
+                    <a href="#latest" class="primary-button">
+                        Переглянути новини <span>→</span>
+                    </a>
+
+                    <div class="hero-note">
+                        <span class="note-line"></span>
+                        Твій щоденний огляд важливого
+                    </div>
+                </div>
+
+                <div class="hero-visual">
+                    {% if articles %}
+                    <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSBICfJZcl9uiLkr4wg8BMPqM6-NnMqDK_5LTCWnQx6SJ2cH7d8KNcfeh0&s=10" alt="Ілюстрація до новини про сучасні технології">
+                    {% endif %}
+
+                    <div class="hero-image-label">
+                        <span class="label-dot"></span>
+                        СВІТ ТЕХНОЛОГІЙ
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        {% if breaking_articles %}
+        <section class="breaking-news" id="breaking">
+            <div class="breaking-news-heading">
+                <span class="breaking-label">BREAKING NEWS</span>
+                <h2>Термінові новини</h2>
+            </div>
+        
+            <div class="breaking-news-list">
+                {% for article in breaking_articles %}
+                <a href="{{ url_for('article', article_id=article.id) }}" class="breaking-news-item">
+                    <span class="breaking-dot"></span>
+                    <div>
+                        <h3>{{ article.title }}</h3>
+                        <p>{{ article.description }}</p>
+                    </div>
+                </a>
+                {% endfor %}
+            </div>
+        </section>
+        {% endif %}
+
+        <form method="GET" action="{{ url_for('index') }}" class="recommendation-filter">
+            <label for="recommendation">Спосіб рекомендацій:</label>
+        
+            <select name="recommendation" id="recommendation">
+                <option value="category" {% if selected_recommendation=="category" %}selected{% endif %}>
+                    За улюбленими категоріями
+                </option>
+        
+                <option value="viewed" {% if selected_recommendation=="viewed" %}selected{% endif %}>
+                    За переглядами
+                </option>
+        
+                <option value="liked" {% if selected_recommendation=="liked" %}selected{% endif %}>
+                    За вподобаннями
+                </option>
+            </select>
+        
+            <button type="submit">Показати</button>
+        </form>
+
+        {% if current_user.is_authenticated and recommended_articles %}
+        <section class="recommendations-section">
+            <h2>Рекомендовано для вас</h2>
+        
+            <div class="articles-grid">
+                {% for article in recommended_articles %}
+                <article class="article-card">
+                    {% if article.image %}
+                    <img src="{{ article.image }}" alt="{{ article.title }}">
+                    {% endif %}
+        
+                    <div class="article-card-content">
+                        <h3>{{ article.title }}</h3>
+                        <p>{{ article.lead }}</p>
+        
+                        <a href="{{ url_for('article', article_id=article.id) }}">
+                            Читати новину
+                        </a>
+                    </div>
+                </article>
+                {% endfor %}
+            </div>
+        </section>
+        {% endif %}
+
+        <section class="news-section" id="latest">
+            <div class="container">
+
+                <div class="section-heading">
+                    <div>
+                        <span class="section-kicker">БУДЬ У КУРСІ</span>
+                        <h2>Останні новини<span>.</span></h2>
+                        <p class="section-description">
+                            Цікаві матеріали з різних сфер життя.
+                        </p>
+                    </div>
+
+                    <div class="news-count">
+                        <span>{{ articles|length }}</span>
+                        матеріалів
+                    </div>
+                </div>
+
+                <div class="toolbar" id="categories">
+
+                    <div class="category-list">
+                        {% for category in categories %}
+                        <button type="button" class="category-button {% if loop.first %}selected{% endif %}"
+                            data-category="{{ category }}">
+                            {{ category }}
+                        </button>
+                        {% endfor %}
+                    </div>
+
+                    <form class="search-form" id="searchForm">
+                        <span class="search-icon">⌕</span>
+                        <input type="search" id="searchInput" placeholder="Знайти новину..." aria-label="Пошук новин">
+                        <button type="submit" aria-label="Шукати">→</button>
+                    </form>
+
+                </div>
+
+                <div class="news-grid" id="newsGrid">
+
+                    {% for article in articles if not article.is_exclusive %}
+                    <article class="news-card" data-category="{{ article.category.name }}"
+                        data-title="{{ article.title|lower }}" data-description="{{ article.description|lower }}"
+                        data-author="{{ article.author|lower }}">
+
+                        <a href="{{ url_for('article', article_id=article.id) }}" class="card-image">
+                            <img src="{{ article.image }}" alt="{{ article.title }}" loading="lazy">
+                            <span class="image-category">
+                                {{ article.category.name }}
+                            </span>
+                        </a>
+
+                        <div class="card-content">
+
+                            <div class="article-meta">
+                                <span>{{ article.published_at.strftime('%d.%m.%Y') }}</span>
+                                <span class="meta-separator">•</span>
+                                <span>{{ article.author }}</span>
+                            </div>
+
+                            <h3>
+                                <a href="{{ url_for('article', article_id=article.id) }}">
+                                    {{ article.title }}
+                                </a>
+                            </h3>
+
+                            <p class="card-description">
+                                {{ article.description }}
+                            </p>
+
+                            <a href="{{ url_for('article', article_id=article.id) }}" class="read-more">
+                                Читати далі <span>→</span>
+                            </a>
+
+                        </div>
+                    </article>
+                    {% endfor %}
+
+                </div>
+
+                <div class="empty-state" id="emptyState" hidden>
+                    <span class="empty-icon">⌕</span>
+                    <h3>Новин не знайдено</h3>
+                    <p>Спробуй змінити пошуковий запит або категорію.</p>
+                    <button type="button" id="resetFilters">
+                        Показати всі новини
+                    </button>
+                </div>
+
+            </div>
+        </section>
+        {% if exclusive_articles %}
+        <section class="exclusive-section" id="exclusive">
+        
+            <div class="exclusive-header">
+                <div>
+                    <span class="exclusive-label">NEWSHUB PREMIUM</span>
+                    <h2>Ексклюзивні матеріали</h2>
+                    <p>Особливі історії, аналітика та цікаві матеріали для наших читачів.</p>
+                </div>
+            </div>
+        
+            <div class="exclusive-grid">
+                {% for article in exclusive_articles %}
+                <article class="exclusive-card">
+        
+                    <div class="exclusive-image">
+                        <img src="{{ article.image }}" alt="{{ article.title }}">
+                        <span class="exclusive-badge">🔒 PREMIUM</span>
+                    </div>
+        
+                    <div class="exclusive-content">
+                        <span class="exclusive-category">
+                            {{ article.category.name }}
+                        </span>
+        
+                        <h3>{{ article.title }}</h3>
+        
+                        <p class="article-lead">{{ article.description }}</p>
+        
+                        <a href="{{ url_for('article', article_id=article.id) }}">
+                            Читати матеріал →
+                        </a>
+                    </div>
+        
+                </article>
+                {% endfor %}
+            </div>
+        
+        </section>
+        {% endif %}
+
+        <section class="newsletter">
+            <div class="container newsletter-content">
+                <div>
+                    <span class="section-kicker">NEWSHUB ДЛЯ ТЕБЕ</span>
+                    <h2>Важливе — в одному місці.</h2>
+                    <p>
+                        Ми створюємо простір, де зручно знаходити
+                        цікаві матеріали та відкривати нові теми.
+                    </p>
+                </div>
+
+                <a href="#latest" class="newsletter-button">
+                    Перейти до новин <span>→</span>
+                </a>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="site-footer">
+        <div class="container footer-content">
+
+            <a href="{{ url_for('index') }}" class="logo footer-logo">
+                News<span>Hub</span><span class="logo-dot">.</span>
+            </a>
+
+            <p>Твоє джерело актуальних новин.</p>
+
+            <span class="copyright">© 2026 NewsHub</span>
+
+        </div>
+    </footer>
+
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+
+</html>

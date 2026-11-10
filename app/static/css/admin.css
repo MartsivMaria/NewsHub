@@ -1,0 +1,130 @@
+.admin-dashboard {
+    max-width: 1100px;
+    margin: 50px auto;
+    padding: 20px;
+}
+
+.admin-dashboard h1 {
+    margin-bottom: 10px;
+}
+
+.admin-dashboard>p {
+    margin-bottom: 25px;
+}
+
+.admin-dashboard>.header-button {
+    display: inline-block;
+    margin-bottom: 30px;
+}
+
+.admin-actions {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 25px;
+    margin-top: 35px;
+}
+
+.admin-card {
+    padding: 25px;
+    background: white;
+    border-radius: 12px;
+    border: 1px solid #e5e5e5;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.admin-card h2 {
+    margin-bottom: 12px;
+}
+
+.admin-articles-list {
+    width: 100%;
+    margin-top: 25px;
+    padding: 0 20px;
+    box-sizing: border-box;
+    overflow-x: auto;
+}
+
+.admin-articles-list table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+.admin-articles-list th,
+.admin-articles-list td {
+    padding: 16px 20px;
+    text-align: left;
+}
+
+.admin-articles-list th:first-child,
+.admin-articles-list td:first-child {
+    padding-left: 25px;
+}
+
+.admin-articles-list th:last-child,
+.admin-articles-list td:last-child {
+    padding-right: 25px;
+}
+
+.admin-articles-list td:last-child {
+    white-space: nowrap;
+}
+
+.admin-articles-list td:last-child .header-button {
+    display: inline-block;
+    margin-right: 8px;
+    margin-bottom: 8px;
+}
+
+.admin-articles-list td:last-child form {
+    display: inline-block;
+    margin: 0;
+}
+
+.article-form {
+    max-width: 750px;
+    margin-top: 30px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.article-form label {
+    font-weight: 600;
+    margin-top: 10px;
+}
+
+.article-form input,
+.article-form textarea,
+.article-form select {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 15px;
+    box-sizing: border-box;
+    font-family: inherit;
+}
+
+.article-form textarea {
+    resize: vertical;
+    min-height: 100px;
+}
+
+.article-form button,
+.article-form a {
+    margin-top: 15px;
+    width: fit-content;
+}
+
+.admin-card .header-button {
+    display: inline-block;
+    margin-top: 18px;
+    margin-right: 10px;
+}
+
+@media (max-width: 700px) {
+    .admin-actions {
+        grid-template-columns: 1fr;
+    }
+}

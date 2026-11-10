@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="uk">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <meta name="description" content="{{ article.description }}">
+
+    <title>{{ article.title }} — NewsHub</title>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+
+<body>
+
+    <header class="site-header">
+        <div class="container header-content">
+
+            <a href="{{ url_for('index') }}" class="logo">
+                News<span>Hub</span>
+                <span class="logo-dot">.</span>
+            </a>
+
+            <nav class="main-nav">
+                <a href="{{ url_for('index') }}" class="nav-link active">
+                    Головна
+                </a>
+                <a href="#categories" class="nav-link">Категорії</a>
+                <a href="#latest" class="nav-link">Останні новини</a>
+                <a href="#breaking" class="nav-link">Термінові</a>
+                <a href="#exclusive" class="nav-link">Ексклюзивні</a>
+            </nav>
+
+            <a href="{{ url_for('index') }}" class="header-button">
+                До всіх новин
+            </a>
+
+        </div>
+    </header>
+
+    <main class="article-page">
+        <div class="container">
+
+            <a href="{{ url_for('index') }}" class="article-back">
+                ← Повернутися до новин
+            </a>
+
+            <article class="article-detail">
+
+                <div class="article-detail-meta">
+
+                    <span>
+                        {{ article.published_at.strftime('%d.%m.%Y') }}
+                    </span>
+
+                    <div class="author-follow-section">
+                        <span>Автор: <strong>{{ article.author }}</strong></span>
+                    
+                        {% if current_user.is_authenticated %}
+                        {% if is_following_author %}
+                        <form method="POST" action="{{ url_for('unfollow_author', article_id=article.id) }}">
+                            <button type="submit" class="follow-author-button following">
+                                Не стежити
+                            </button>
+                        </form>
+                        {% else %}
+                        <form method="POST" action="{{ url_for('follow_author', article_id=article.id) }}">
+                            <button type="submit" class="follow-author-button">
+                                + Стежити за автором
+                            </button>
+                        </form>
+                        {% endif %}
+                        {% else %}
+                        <a href="{{ url_for('login') }}" class="follow-author-button">
+                            + Стежити за автором
+                        </a>
+                        {% endif %}
+                    </div>
+
+                    <span>
+                        Переглядів: {{ article.views }}
+                    </span>
+
+                    {% if current_user.is_authenticated %}
+                    {% if article in current_user.saved_articles %}
+                    <form method="POST" action="{{ url_for('remove_saved_article', article_id=article.id) }}">
+                        <button type="submit" class="save-article-button saved">
+                            Видалити зі збережених
+                        </button>
+                    </form>
+                    {% else %}
+                    <form method="POST" action="{{ url_for('save_article', article_id=article.id) }}">
+                        <button type="submit" class="save-article-button">
+                            ♡ Зберегти в обране
+                        </button>
+                    </form>
+                    {% endif %}
+                    {% else %}
+                    <a href="{{ url_for('login') }}" class="save-article-button">
+                        ♡ Зберегти в обране
+                    </a>
+                    {% endif %}
+
+                </div>
+
+                <h1 class="article-title">
+                    {{ article.title }}
+                </h1>
+
+                <p class="article-lead">
+                    {{ article.description }}
+                </p>
+
+                {% if article.image %}
+                <img class="article-cover" src="{{ article.image }}" alt="{{ article.title }}">
+                {% endif %}
+
+                <div class="article-body">
+                    {{ display_content }}
+                </div>
+                
+                {% if article.is_exclusive and not has_full_access %}
+                <div class="paywall">
+                    <div class="paywall-icon">🔒</div>
+                
+                    <h2>Цей матеріал доступний за підпискою</h2>
+                
+                    <p>
+                        Ти переглянув(-ла) початок ексклюзивної статті.
+                        Оформи платний тариф, щоб прочитати її повністю.
+                    </p>
+                
+                    <a href="{{ url_for('plans') }}" class="paywall-button">
+                        Переглянути тарифи
+                    </a>
+                </div>
+                {% endif %}
+                {% if show_ads %}
+                <div class="article-advertisement">
+                
+                    <div class="advertisement-label">
+                        <span>РЕКЛАМА</span>
+                        <span class="ad-icon">Ad</span>
+                    </div>
+                
+                    <div class="advertisement-content">
+                        <div class="advertisement-image">
+                            <span>AD</span>
+                        </div>
+                
+                        <div class="advertisement-info">
+                            <h3>Місце для вашої реклами</h3>
+                            <p>
+                                Тут може розміщуватися рекламна пропозиція
+                                від партнерів NewsHub.
+                            </p>
+                        </div>
+                    </div>
+                
+                </div>
+                {% endif %}
+                <div class="article-detail-footer">
+                    {% if has_full_access %}
+                        {% if current_user.is_authenticated %}
+                            <form method="POST" action="{{ url_for('toggle_like', article_id=article.id) }}" class="like-form">
+                                        
+                                <button type="submit" class="like-button {% if user_liked %}liked{% endif %}">
+                                    {% if user_liked %}
+                                        ♥ Подобається
+                                    {% else %}
+                                        ♡ Подобається
+                                    {% endif %}
+                                    <span>{{ likes_count }}</span>
+                                </button>
+                                </form>
+                                    {% else %}
+                                        <a href="{{ url_for('login') }}" class="like-button">
+                                            ♡ <span>{{ likes_count }}</span>
+                                        </a>
+                                    {% endif %}
+                                {% endif %}
+                                <a href="{{ url_for('index') }}#latest">
+                                    Читати інші новини →
+                                </a>
+                </div>
+
+            </article>
+
+        </div>
+    </main>
+    <section class="comments-section">
+        {% if has_full_access %}
+        <div class="comments-heading">
+            <h2>Коментарі</h2>
+            <span>{{ comments|length }}</span>
+        </div>
+    
+        {% if current_user.is_authenticated %}
+        <form class="comment-form" method="POST" action="{{ url_for('add_comment', article_id=article.id) }}">
+            <label for="comment-content">Залишити коментар</label>
+    
+            <textarea id="comment-content" name="content" placeholder="Поділися своєю думкою..." maxlength="1000"
+                required></textarea>
+    
+            <button type="submit">Опублікувати коментар</button>
+        </form>
+        {% else %}
+        <div class="comment-login-message">
+            <p>Щоб залишити коментар, увійди у свій акаунт.</p>
+            <a href="{{ url_for('login') }}">Увійти в акаунт</a>
+        </div>
+        {% endif %}
+    
+        <div class="comments-list">
+            {% if comments %}
+            {% for comment in comments %}
+            <div class="comment-card">
+                <div class="comment-avatar">
+                    {{ comment.user.username[0]|upper }}
+                </div>
+    
+                <div class="comment-content">
+                    <div class="comment-header">
+                        <strong>{{ comment.user.username }}</strong>
+                        <span>
+                            {{ comment.created_at.strftime('%d.%m.%Y о %H:%M') }}
+                        </span>
+                    </div>
+    
+                    <p>{{ comment.content }}</p>
+    
+                    {% if current_user.is_authenticated and comment.user_id == current_user.id %}
+                    <form method="POST" action="{{ url_for('delete_comment', comment_id=comment.id) }}">
+                        <button type="submit" class="delete-comment">
+                            Видалити
+                        </button>
+                    </form>
+                    {% endif %}
+                </div>
+            </div>
+            {% endfor %}
+            {% else %}
+            <div class="no-comments">
+                <p>Поки що коментарів немає.</p>
+                <span>Будь першим, хто поділиться своєю думкою!</span>
+            </div>
+            {% endif %}
+        </div>
+        {% endif %}
+    </section>
+
+
+    <footer class="site-footer">
+        <div class="container footer-content">
+
+            <a href="{{ url_for('index') }}" class="logo footer-logo">
+                News<span>Hub</span><span class="logo-dot">.</span>
+            </a>
+
+            <p>Твоє джерело актуальних новин.</p>
+
+            <span class="copyright">© 2026 NewsHub</span>
+
+        </div>
+    </footer>
+
+</body>
+
+</html>

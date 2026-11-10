@@ -1,0 +1,229 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section class="profile-page">
+    <div class="profile-card">
+        <div class="profile-avatar">
+            {{ current_user.username[0]|upper }}
+        </div>
+
+        <h1>Мій профіль</h1>
+        <p class="profile-subtitle">Інформація про твій акаунт</p>
+
+        <div class="profile-info">
+            <div class="profile-info-item">
+                <span>Ім'я користувача</span>
+                <strong>{{ current_user.username }}</strong>
+            </div>
+
+            <div class="profile-info-item">
+                <span>Електронна пошта</span>
+                <strong>{{ current_user.email }}</strong>
+            </div>
+
+            <div class="profile-info-item">
+                <span>Дата реєстрації</span>
+                <strong>
+                    {{ current_user.created_at.strftime('%d.%m.%Y') }}
+                </strong>
+            </div>
+
+            <div class="profile-info-item">
+                <span>Тип акаунта</span>
+                <strong>
+                    {% if current_user.role == "admin" %}
+                    Адміністратор
+                    {% else %}
+                    Користувач
+                    {% endif %}
+                </strong>
+            </div>
+        </div>
+                <div class="subscription-profile">
+                    <div class="subscription-profile-header">
+                        <div>
+                            <h2>Моя підписка</h2>
+                        </div>
+                    </div>
+                
+                    <div class="subscription-current">
+                        <div>
+                            <span>Поточний тариф</span>
+                            <strong>
+                                {% if current_user.subscription_plan == "premium" %}
+                                Premium
+                                {% elif current_user.subscription_plan == "student" %}
+                                Student
+                                {% elif current_user.subscription_plan == "corporate" %}
+                                Corporate
+                                {% else %}
+                                Free
+                                {% endif %}
+                            </strong>
+                        </div>
+                
+                        <span class="subscription-status">Активний</span>
+                    </div>
+                
+                    <p class="subscription-description">
+                        {% if current_user.subscription_plan == "free" %}
+                        Ти користуєшся безкоштовним тарифом. Оформи платну підписку, щоб читати ексклюзивні матеріали без реклами.
+                        {% else %}
+                        Тобі доступні всі ексклюзивні матеріали та читання без реклами.
+                        {% endif %}
+                    </p>
+                
+                    <a href="{{ url_for('plans') }}" class="subscription-profile-button">
+                        Переглянути тарифи
+                    </a>
+                </div>
+                <div class="favorite-categories">
+                    <h2>Мої улюблені теми</h2>
+                    <p>Обери категорії новин, які тебе цікавлять</p>
+                
+                    <form method="POST">
+                        <div class="category-options">
+                            {% for category in categories %}
+                            <label class="category-option">
+                                <input type="checkbox" name="categories" value="{{ category.id }}" {% if category in
+                                    current_user.favorite_categories %}checked{% endif %}>
+                                <span>{{ category.name }}</span>
+                            </label>
+                            {% endfor %}
+                        </div>
+                
+                        <button type="submit" class="save-categories">
+                            Зберегти теми
+                        </button>
+                    </form>
+                </div>
+
+        <div class="notification-settings">
+            <div class="notification-settings-header">
+                <div>
+                    <h2>Налаштування сповіщень</h2>
+                    <p>Обери, які новини та оновлення хочеш отримувати</p>
+                </div>
+                <span class="notification-header-icon">🔔</span>
+            </div>
+        
+            <form method="POST" action="{{ url_for('update_notification_settings') }}">
+        
+                <label class="notification-option">
+                    <div class="notification-option-icon">✉️</div>
+        
+                    <div class="notification-option-info">
+                        <strong>Електронна розсилка</strong>
+                        <span>Отримуй цікаві новини та добірки на свою пошту</span>
+                    </div>
+        
+                    <span class="switch">
+                        <input type="checkbox" name="newsletter_enabled" {% if current_user.newsletter_enabled %}checked{% endif
+                            %}>
+                        <span class="switch-slider"></span>
+                    </span>
+                </label>
+        
+                <label class="notification-option">
+                    <div class="notification-option-icon">📱</div>
+        
+                    <div class="notification-option-info">
+                        <strong>Push-сповіщення</strong>
+                        <span>Дізнавайся про важливі новини та термінові оновлення</span>
+                    </div>
+        
+                    <span class="switch">
+                        <input type="checkbox" name="push_enabled" {% if current_user.push_enabled %}checked{% endif %}>
+                        <span class="switch-slider"></span>
+                    </span>
+                </label>
+        
+                <button type="submit" class="save-notifications">
+                    Зберегти налаштування
+                </button>
+            </form>
+        </div>
+
+        <details class="profile-subscriptions">
+            <summary>
+                Підписки
+            </summary>
+        
+            <div class="followed-authors-list">
+                {% if followed_authors %}
+                {% for followed_author in followed_authors %}
+                <div class="followed-author-item">
+                    <span>{{ followed_author.author_name }}</span>
+        
+                    <form method="POST" action="{{ url_for('unfollow_author_from_profile') }}">
+                        <input type="hidden" name="author_name" value="{{ followed_author.author_name }}">
+        
+                        <button type="submit">
+                            Відписатися
+                        </button>
+                    </form>
+                </div>
+                {% endfor %}
+                {% else %}
+                <p>Ви ще не стежите за жодним автором.</p>
+                {% endif %}
+            </div>
+        </details>
+
+        <details class="saved-articles-section">
+            <summary>
+                <span>Збережені статті</span>
+                <span class="saved-arrow">⌄</span>
+            </summary>
+        
+            {% if current_user.saved_articles %}
+            <div class="saved-articles-list">
+                {% for article in current_user.saved_articles %}
+                <div class="saved-article-card">
+        
+                    {% if article.image %}
+                    <img src="{{ article.image }}" alt="{{ article.title }}">
+                    {% endif %}
+        
+                    <div class="saved-article-info">
+                        <span class="saved-article-category">
+                            {{ article.category.name }}
+                        </span>
+        
+                        <h3>
+                            <a href="{{ url_for('article', article_id=article.id) }}">
+                                {{ article.title }}
+                            </a>
+                        </h3>
+        
+                        <p>{{ article.description }}</p>
+        
+                        <div class="saved-article-actions">
+                            <a href="{{ url_for('article', article_id=article.id) }}">
+                                Читати новину →
+                            </a>
+        
+                            <form method="POST"
+                                action="{{ url_for('remove_saved_article_from_profile', article_id=article.id) }}">
+                                <button type="submit">Видалити</button>
+                            </form>
+                        </div>
+                    </div>
+        
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="saved-articles-empty">
+                <p>Збережених статей немає.</p>
+                <a href="{{ url_for('index') }}">Переглянути новини →</a>
+            </div>
+            {% endif %}
+        </details>
+
+        <a href="{{ url_for('index') }}" class="profile-back">
+            Повернутися до новин
+        </a>
+    </div>
+</section>
+{% endblock %}

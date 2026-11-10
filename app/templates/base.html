@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="uk">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NewsHub — Новинна онлайн-газета</title>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+
+
+<body>
+    <header class="site-header">
+        <a href="{{ url_for('index') }}" class="site-logo">NewsHub</a>
+
+        <p>Твоє джерело актуальних новин</p>
+
+        <nav class="user-navigation">
+            {% if current_user.is_authenticated %}
+            </a>
+            {% if current_user.role == "admin" %}
+            <a href="{{ url_for('admin_panel') }}" class="header-button">
+                Адмін-панель
+            </a>
+            {% endif %}
+        
+            <form action="{{ url_for('logout') }}" method="POST">
+                <button type="submit">Вийти</button>
+            </form>
+            {% else %}
+            <a href="{{ url_for('login') }}">Увійти</a>
+            <a href="{{ url_for('register') }}">Реєстрація</a>
+            {% endif %}
+        </nav>
+    </header>
+
+    <main>
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer>
+        <p>NewsHub © 2026</p>
+    </footer>
+</body>
+
+</html>

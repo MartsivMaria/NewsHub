@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section class="admin-dashboard">
+    <h1>Редагування новини</h1>
+    <p>Змініть потрібну інформацію та збережіть зміни.</p>
+
+    <form method="POST" class="article-form">
+
+        <label for="title">Назва новини</label>
+        <input type="text" id="title" name="title" value="{{ article.title }}" maxlength="200" required>
+
+        <label for="description">Короткий опис</label>
+        <textarea id="description" name="description" maxlength="500" required>{{ article.description }}</textarea>
+
+        <label for="content">Повний текст новини</label>
+        <textarea id="content" name="content" rows="10" required>{{ article.content }}</textarea>
+
+        <label for="author">Автор</label>
+        <input type="text" id="author" name="author" value="{{ article.author }}" maxlength="120" required>
+
+        <label for="image">Посилання на зображення</label>
+        <input type="url" id="image" name="image" value="{{ article.image or '' }}">
+
+        <label for="category_id">Категорія</label>
+        <select id="category_id" name="category_id" required>
+            {% for category in categories %}
+            <option value="{{ category.id }}" {% if category.id==article.category_id %}selected{% endif %}>
+                {{ category.name }}
+            </option>
+            {% endfor %}
+        </select>
+
+        <div class="article-options">
+            <label>
+                <input type="checkbox" name="is_breaking" {% if article.is_breaking %}checked{% endif %}>
+                Термінова новина (Breaking News)
+            </label>
+        
+            <label>
+                <input type="checkbox" name="is_exclusive" {% if article.is_exclusive %}checked{% endif %}>
+                Ексклюзивна новина (Exclusive)
+            </label>
+        </div>
+
+        <button type="submit" class="header-button">
+            Зберегти зміни
+        </button>
+
+        <a href="{{ url_for('admin_articles') }}" class="header-button">
+            Скасувати
+        </a>
+
+    </form>
+</section>
+{% endblock %}

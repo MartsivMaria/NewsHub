@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section class="auth-page">
+    <div class="auth-card">
+        <h1>Вхід до NewsHub</h1>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        {% for category, message in messages %}
+        <div class="flash-message {{ category }}">
+            {{ message }}
+        </div>
+        {% endfor %}
+        {% endif %}
+        {% endwith %}
+
+        <form method="POST">
+            <label for="identifier">Email або ім'я користувача</label>
+            <input id="identifier" type="text" name="identifier" required autocomplete="username">
+
+            <label for="password">Пароль</label>
+            <input id="password" type="password" name="password" required autocomplete="current-password">
+
+            <button type="submit">Увійти</button>
+        </form>
+
+        <p>
+            Ще не маєте акаунта?
+            <a href="{{ url_for('register') }}">Зареєструватися</a>
+        </p>
+    </div>
+</section>
+{% endblock %}

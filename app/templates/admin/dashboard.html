@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section class="admin-dashboard">
+    <h1>Панель адміністратора</h1>
+    <p>Вітаємо в адміністративній частині NewsHub!</p>
+
+    <div class="admin-actions">
+        <div class="admin-card">
+            <h2>Керування новинами</h2>
+            <p>Перегляд, додавання та видалення новин.</p>
+        
+            <a href="{{ url_for('admin_articles') }}" class="header-button">
+                Перейти до новин
+            </a>
+            <a href="{{ url_for('add_article') }}" class="header-button">
+                Додати новину
+            </a>
+        </div>
+
+        <div class="admin-card">
+            <h2>Новинний дайджест</h2>
+            <p>Формування персональної добірки новин для підписаних користувачів.</p>
+        
+            <form action="{{ url_for('generate_digest') }}" method="POST"
+                onsubmit="return confirm('Сформувати дайджест для всіх підписаних користувачів?');">
+                <button type="submit" class="header-button">
+                    Сформувати дайджест
+                </button>
+            </form>
+        </div>
+    </div>
+</section>
+<footer class="site-footer">
+    <div class="container footer-content">
+
+        <a href="{{ url_for('index') }}" class="logo footer-logo">
+            News<span>Hub</span><span class="logo-dot">.</span>
+        </a>
+
+        <p>Твоє джерело актуальних новин.</p>
+
+        <span class="copyright">© 2026 NewsHub</span>
+
+    </div>
+</footer>
+{% endblock %}
